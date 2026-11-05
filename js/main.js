@@ -52,14 +52,30 @@ let alumnos = [
 
 ];
 
+function aplicarFiltros() {
+    const textoBuscado = busqueda.value.toLowerCase().trim();
+    const cursoBuscado = filtroCurso.value.toLowerCase();
+
+    const alumnosFiltrados = alumnos.filter((alumno) => {
+        const coincideNombre = alumno.nombre.includes(textoBuscado);
+        const coincideCurso = cursoBuscado === "" || alumno.materia === cursoBuscado;
+
+        return coincideCurso && coincideNombre;
+    });
+
+    renderizarAlumnos(alumnosFiltrados);
+}
+
 function renderizarAlumnos(lista) {
     contenedorAlumnos.innerHTML = "";
 
     lista.forEach((alumno) => {
         const tarjeta = document.createElement("article");
+        const titulo = document.createElement("h3");
+
+        titulo.textContent = alumno.nombre.toUpperCase();
 
         tarjeta.innerHTML = `
-        <h3>${alumno.nombre.toUpperCase()}</h3>
         <p><strong>Materia:</strong>
         ${alumno.materia.toUpperCase()}</p>
         <p><strong>Promedio:</strong>
@@ -68,6 +84,7 @@ function renderizarAlumnos(lista) {
         ${alumno.aprobado ? "Aprobado" : "Desaprobado"}</p>
         <button class="btn-eliminar" data-id="${alumno.id}">Eliminar</button>
         `;
+        contenedorAlumnos.appendChild(titulo);
         contenedorAlumnos.appendChild(tarjeta);
     });
 }
@@ -84,33 +101,15 @@ contenedorAlumnos.addEventListener("click", (e) => {
     }
 })
 
-busqueda.addEventListener("input", () => {
-    const textoBuscado = busqueda.value.toLowerCase().trim();
+busqueda.addEventListener("input", aplicarFiltros);
 
-    const alumnosFiltrados = alumnos.filter(alumno => alumno.nombre.toLowerCase().includes(textoBuscado));
-
-    renderizarAlumnos(alumnosFiltrados);
-
-});
-
-filtroCurso.addEventListener("change", () => {
-    const cursoSeleccionado = filtroCurso.value;
-
-    if (cursoSeleccionado === "") {
-        renderizarAlumnos(alumnos);
-    } else {
-        const alumnosFiltrados = alumnos.filter(alumno => alumno.materia.toLowerCase() === cursoSeleccionado.toLowerCase());
-
-
-        renderizarAlumnos(alumnosFiltrados);
-    }
-});
+filtroCurso.addEventListener("change", aplicarFiltros);
 
 formulario.addEventListener("submit", (e) => {
     e.preventDefault();
 
     const nombre = inputNombre.value.trim();
-    if (!isNaN(nombre)) {
+    if (nombre === "" || !isNaN(nombre)) {
         mensaje.textContent = "El nombre no puede ser numeros.";
         mensaje.className = "mensaje-error";
         return;
@@ -118,12 +117,16 @@ formulario.addEventListener("submit", (e) => {
     const curso = inputCurso.value;
     const nota = parseFloat(inputNota.value);
 
+    let siguienteId = 7;
+
     const nuevoAlumno = new Alumnos(
-        alumnos.length + 1,
+        siguienteId,
         nombre,
         curso,
         nota
     );
+
+    siguienteId++;
 
     alumnos.push(nuevoAlumno);
 
