@@ -31,6 +31,7 @@ header {
     align-self: auto;
 
 
+
     &:hover {
         color: var(--bg-light);
         transform: translateY(-4px);
@@ -65,11 +66,17 @@ form {
 
 
 #section-formulario {
-    padding: 60px;
+    grid-area: agre;
+    padding: 50px;
     background-color: var(--bg-light);
     border-radius: 10px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+}
+
+#section-formulario h2 {
+    font-size: 1.6rem;
+    margin-top: 10px;
 }
 
 #nombre {
@@ -107,10 +114,13 @@ form {
 
 
 #buscar-alumnos {
+    grid-area: filtrado;
     background-color: var(--bg-light);
     border-radius: 10px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    height: 300px;
+    width: 400x;
 }
 
 #container {
@@ -126,7 +136,7 @@ form {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    padding: 20;
+    padding: 20px;
     background-color: #ffffff;
     border: 1px solid #000000;
     border-radius: 14px;
@@ -139,7 +149,7 @@ form {
 
 #contenedor-alumnos article {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
     justify-content: space-between;
     gap: 16px;
@@ -162,16 +172,52 @@ form {
 
 }
 
+.cajas-formularios {
+    display: grid;
+    grid-template-columns: 1fr, 1fr;
+    grid-template-rows: 1fr, 1fr;
+    grid-template-areas:
+        "agre estadis"
+        "filtrado filtrado";
+    gap: 0.1px;
+}
+
+.tarjeta-titulo {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #111;
+    margin: 0;
+    text-align: center;
+}
+
+.tarjeta-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 16px;
+}
+
 #estadisticas {
+    grid-area: estadis;
     background-color: var(--bg-light);
     border-radius: 10px;
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    height: 400px;
+}
+
+#estadisticas h2 {
+    font-size: 1.5rem;
+    margin-top: 10%;
 
 }
 
 #estadisticas p {
     font-weight: bold;
+    margin-top: 20px;
+    font-size: 1.3rem;
 }
 
 #seccion-alumnos {
@@ -210,6 +256,27 @@ form {
     border-radius: 10px;
     background-color: #fea0a0;
     color: rgb(166, 21, 21);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+
+    &:hover {
+        transform: translateY(-5px);
+    }
+
+}
+
+.btn-modificar {
+    width: auto;
+    margin-top: 14px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    background-color: #7e98ef;
+    color: rgb(31, 111, 201);
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;

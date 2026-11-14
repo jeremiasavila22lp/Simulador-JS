@@ -16,59 +16,61 @@
     </header>
 
     <main>
-        <section id="section-formulario">
-            <h2>Agregar alumno</h2>
+        <section class="cajas-formularios">
+            <section id="section-formulario">
+                <h2>Agregar alumno</h2>
 
-            <form id="formulario-alumno">
-                <label for="nombre">Nombre</label>
-                <input id="nombre" name="nombre" type="text" required>
+                <form id="formulario-alumno">
+                    <label for="nombre">Nombre</label>
+                    <input id="nombre" name="nombre" type="text" required>
 
-                <label for="curso">Curso</label>
-                <select id="curso" name="curso" required>
-                    <option value="">Seleccionar Curso</option>
+                    <label for="curso">Curso</label>
+                    <select id="curso" name="curso" required>
+                        <option value="">Seleccionar Curso</option>
+                        <option value="JS">JS</option>
+                        <option value="HTML">HTML</option>
+                        <option value="Python">Python</option>
+                    </select>
+
+                    <label for="nota">Nota (0 a 10)</label>
+                    <input id="nota" name="nota" type="number" min="0" max="10" step="0.1" required>
+
+                    <button id="submit" type="submit">Agregar alumnos</button>
+                </form>
+
+                <p id="mensaje" role="status" aria-live="polite"></p>
+            </section>
+
+            <section id="estadisticas">
+
+                <h2>Estadisctica de Alumnos:</h2>
+                <p>Alumnos: <span id="total-alumnos">0</span></p>
+                <p>Promedio general: <span id="promedio-general">-</span></p>
+                <p>Aprobados: <span id="total-aprobados">0</span></p>
+
+            </section>
+
+            <section id="buscar-alumnos">
+                <h2>Buscar Alumnos</h2>
+                <label for="busqueda">Buscar por nombre</label>
+                <input id="busqueda" type="search" placeholder="Escribi un nombre...">
+
+                <label for="filtro-curso">Filtrado de curso</label>
+                <select id="filtro-curso">
+                    <option value="">Todos los cursos</option>
                     <option value="JS">JS</option>
                     <option value="HTML">HTML</option>
                     <option value="Python">Python</option>
                 </select>
-
-                <label for="nota">Nota (0 a 10)</label>
-                <input id="nota" name="nota" type="number" min="0" max="10" step="0.1" required>
-
-                <button id="submit" type="submit">Agregar alumnos</button>
-            </form>
-
-            <p id="mensaje" role="status" aria-live="polite"></p>
+            </section>
         </section>
 
-        <section id="estadisticas">
-
-            <h2>Estadisctica de Alumnos:</h2>
-            <p>Alumnos: <span id="total-alumnos">0</span></p>
-            <p>Promedio general: <span id="promedio-general">-</span></p>
-            <p>Aprobados: <span id="total-aprobados">0</span></p>
-
-        </section>
-
-        <section id="buscar-alumnos">
-            <h2>Buscar Alumnos</h2>
-            <label for="busqueda">Buscar por nombre</label>
-            <input id="busqueda" type="search" placeholder="Escribi un nombre...">
-
-            <label for="filtro-curso">Filtrado de curso</label>
-            <select id="filtro-curso">
-                <option value="">Todos los cursos</option>
-                <option value="JS">JS</option>
-                <option value="HTML">HTML</option>
-                <option value="Python">Python</option>
-            </select>
-        </section>
 
         <section id="seccion-alumnos">
             <h2>Listado de alumnos</h2>
             <div id="contenedor-alumnos"></div>
         </section>
     </main>
-    <!-- Crear la estructura HTML para adaptarla al main.js -->
 </body>
 
 </html>
