@@ -174,8 +174,8 @@ form {
 
 .cajas-formularios {
     display: grid;
-    grid-template-columns: 1fr, 1fr;
-    grid-template-rows: 1fr, 1fr;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
     grid-template-areas:
         "agre estadis"
         "filtrado filtrado";
@@ -222,6 +222,9 @@ form {
 
 #seccion-alumnos {
     display: grid;
+    width: 90%;
+    max-width: 950px;
+    margin-top: 20px;
     font-family: "Abel", sans-serif;
     font-size: 1.2rem;
     font-weight: 100;
