@@ -1,0 +1,38 @@
+[
+    {
+        "id": 1,
+        "nombre": "Avila",
+        "materia": "JS",
+        "promedio": 9
+    },
+    {
+        "id": 2,
+        "nombre": "Luna",
+        "materia": "JS",
+        "promedio": 8.5
+    },
+    {
+        "id": 3,
+        "nombre": "Campos",
+        "materia": "JS",
+        "promedio": 4
+    },
+    {
+        "id": 4,
+        "nombre": "Fernandez",
+        "materia": "HTML",
+        "promedio": 9
+    },
+    {
+        "id": 5,
+        "nombre": "Rojas",
+        "materia": "HTML",
+        "promedio": 8.5
+    },
+    {
+        "id": 6,
+        "nombre": "Perez",
+        "materia": "HTML",
+        "promedio": 9
+    }
+]

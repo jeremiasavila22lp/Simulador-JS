@@ -9,9 +9,10 @@ const promedioGeneral = document.querySelector("#promedio-general");
 const totalAprobados = document.querySelector("#total-aprobados");
 const busqueda = document.querySelector("#busqueda");
 const filtroCurso = document.querySelector("#filtro-curso");
-const promedioNotas = (sumaNotas, cantidadNotas) => (sumaNotas / cantidadNotas);
+const estadoCarga = document.querySelector("#estado-carga");
+const estadoInforme = document.querySelector("#estado-informe");
+const btnGenerarInforme = document.querySelector("#btn-generar-informe");
 
-// class de alumnos
 class Alumnos {
     constructor(id, nombre, materia, promedio) {
         this.id = id;
@@ -41,17 +42,69 @@ class Alumnos {
 
 }
 
+async function iniciarAplicacion() {
+
+    estadoCarga.hidden = false;
+
+    let datosIniciales;
+
+    try {
+
+        const datosGuardados = obtenerAlumnosStorage();
+
+        if (datosGuardados !== null) {
+            datosIniciales = datosGuardados;
+        } else {
+
+            const respuesta = await fetch("./data.json")
+
+            if (!respuesta.ok) {
+
+                throw new Error("No se puedo obtener datos JSON");
+
+            }
+
+            datosIniciales = await respuesta.json();
+
+        }
+
+        alumnos = convertirAlumnos(datosIniciales);
+
+        console.log("Datos recibidos correctamente", alumnos);
+
+    } catch (error) {
+
+        console.error("Error al cargar alumnos:", error);
+
+        alumnos = [];
+
+        Swal.fire({
+            title: "Error al cargar los datos",
+            text: "Intenta de nuevo",
+            icon: "error"
+        });
+
+    } finally {
+
+        estadoCarga.hidden = true;
+
+    }
+
+    aplicarFiltros();
+    actualizarEstadisticas();
+}
+
 const STORAGE_KEY = "gestorAlumnos";
 
-let alumnosIniciales = [
-    new Alumnos(1, "Avila", "JS", 9),
-    new Alumnos(2, "Luna", "JS", 8.5),
-    new Alumnos(3, "Campos", "JS", 4),
-    new Alumnos(4, "Fernandez", "HTML", 9),
-    new Alumnos(5, "Rojas", "HTML", 8.5),
-    new Alumnos(6, "Perez", "HTML", 9),
+function convertirAlumnos(datos) {
 
-];
+    return datos.map(({ id, nombre, materia, promedio }) => {
+
+        return new Alumnos(id, nombre, materia, promedio);
+
+    });
+
+}
 
 function modificarPromedio(id, nuevoPromedio) {
 
@@ -67,21 +120,113 @@ function modificarPromedio(id, nuevoPromedio) {
 
 }
 
+
 function guardarAlumnos() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(alumnos, null, 2));
 }
 
+
 function obtenerAlumnosStorage() {
 
-    const datos = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    const datosGuardados = localStorage.getItem(STORAGE_KEY);
 
-    const listaRecuperada = datos ?? alumnosIniciales;
+    if (datosGuardados === null) {
+        return null;
+    }
 
-    return listaRecuperada.map(a => new Alumnos(a.id, a.nombre, a.materia, a.promedio));
+    try {
+
+        const datos = JSON.parse(datosGuardados);
+
+        if (!Array.isArray(datos)) {
+            throw new Error(`Los datos en el storage no son un array:, ${datosGuardados}`);
+        }
+
+        return datos;
+
+    } catch (error) {
+
+        console.error("Error al obtener los datos del storage:", error);
+
+        return null;
+
+    }
+}
+
+let alumnos = [];
+
+function mostrarNotificacion(texto, tipo = "exito") {
+
+    Toastify({
+        text: texto,
+        duration: 3000,
+        gravity: "top",
+        position: "right",
+        close: true,
+        stopOnFocus: true,
+        style: {
+            background: tipo === "exito" ?
+                "green"
+                : "red"
+        }
+
+    }).showToast();
 
 }
 
-let alumnos = obtenerAlumnosStorage();
+function confirmarModificaciones(nuevoPromedio) {
+
+    return Swal.fire({
+        title: "Quieres guardar los cambios?",
+        text: `Nuevo promedio: ${nuevoPromedio}`,
+        icon: "question",
+        showDenyButton: true,
+        showCancelButton: true,
+        confirmButtonText: "Guardar",
+        denyButtonText: `No guardar`,
+        cancelButtonText: "Cancelar"
+    })
+
+}
+
+
+async function gestionModificacionPromedio(id, nuevoPromedio) {
+
+    try {
+
+        const resultado = await confirmarModificaciones(nuevoPromedio);
+
+        if (resultado.isConfirmed) {
+
+            modificarPromedio(id, nuevoPromedio);
+
+            Swal.fire(
+                "Promedio modificado correctamente.",
+                "",
+                "success"
+            );
+
+        } else if (resultado.isDenied) {
+
+            Swal.fire(
+                "Cambios no realizados",
+                "El promedio no fue modificado",
+                "info"
+            );
+
+
+        }
+    } catch (error) {
+
+        console.error("Error al gestionar modificacion del promedio:", error);
+        Swal.fire(
+            "Error",
+            "No se pudo modificar el promedio.",
+            "error"
+        );
+    }
+
+}
 
 function aplicarFiltros() {
     const textoBuscado = busqueda.value.toLowerCase().trim();
@@ -97,6 +242,26 @@ function aplicarFiltros() {
     renderizarAlumnos(alumnosFiltrados);
 }
 
+function limpiarAlumnos() {
+
+    alumnos.length = 0;
+
+    guardarAlumnos();
+    aplicarFiltros();
+    actualizarEstadisticas();
+};
+
+const btnEliminarAlumnos = document.getElementById("btn-limpiar-alumnos");
+
+btnEliminarAlumnos.addEventListener("click", () => {
+
+    limpiarAlumnos();
+
+    mensaje.textContent = "Todos los alumnos han sido eliminados con exito.";
+    mensaje.className = "mensaje-exito";
+
+});
+
 function renderizarAlumnos(lista) {
     contenedorAlumnos.innerHTML = "";
 
@@ -107,14 +272,37 @@ function renderizarAlumnos(lista) {
     <h3 class="tarjeta-titulo">${nombre.toUpperCase()}</h3>   
 
     <div class="tarjeta-info">
+
         <p><strong>Materia:</strong>
         ${materia.toUpperCase()}</p>
+
         <p><strong>Promedio:</strong> 
         ${promedio}</p>
+
         <p><strong>Estado:</strong>
         ${aprobado ? "Aprobado" : "Desaprobado"}</p>
+
         <button class="btn-eliminar" data-id="${id}">Eliminar</button>
-        <button class="btn-modificar" data-id="${id}">Modificar Promedio</button>     
+
+        <button class="btn-modificar" data-id="${id}">Modificar Promedio</button> 
+
+        <form class="form-modificar" data-id="${id}" hidden>
+            <input 
+                type = "number"
+                class = "input-promedio"
+                value = "${promedio}"
+                min = "0"
+                max = "10"
+                step = "0.01"
+                required
+            >
+        
+        <button class="btn-guardar" type="submit">Guardar</button>
+
+        <button class="btn-cancelar" type="button">
+            Cancelar
+        </button>        
+        </form>    
     </div>
         `;
 
@@ -122,30 +310,57 @@ function renderizarAlumnos(lista) {
     });
 }
 
+function mostrarAvisoDocente() {
+    const aviso = document.createElement("div");
+    aviso.className = "aviso-docente";
+
+    aviso.innerHTML = `
+    <section class="aviso-limite">
+    <button id="cerrar-aviso" type=button aria-label="Cerrar aviso">&times;</button>
+    <span> <strong>Bienvenido al sistema de gestión escolar</strong> </span>
+    <p>Aquí podrás gestionar las calificaciones de los alumnos.</p>
+    <span>Recuerda de cargar los datos con total responsabilidad y antes del viernes.</span>
+    </section>
+    `;
+
+    const main = document.querySelector("main");
+
+    if (!main) return;
+
+    main.prepend(aviso);
+
+    const btnCerrar = aviso.querySelector("#cerrar-aviso");
+    btnCerrar.addEventListener("click", () => {
+        aviso.remove()
+    });
+
+} setTimeout(mostrarAvisoDocente, 3000);
+
+
+
 contenedorAlumnos.addEventListener("click", (e) => {
+
     const botonModificar = e.target?.closest(".btn-modificar");
 
     if (botonModificar) {
 
-        const id = Number(botonModificar.dataset.id);
+        const tarjeta = botonModificar.closest("article");
 
-        const nuevoPromedio = parseFloat(prompt("Ingresa el nuevo promedio:")
-        );
+        const formulario = tarjeta.querySelector(".form-modificar");
 
-        if (!Number.isFinite(nuevoPromedio) ||
-            nuevoPromedio < 0 ||
-            nuevoPromedio > 10) {
-            mensaje.textContent = "Ingresa un promedio valido entre 0 y 10."
-            mensaje.className = "mensaje-error";
-            return;
-        }
+        formulario.hidden = false;
 
-        modificarPromedio(id, nuevoPromedio);
-
-        mensaje.textContent = "Promedio actualizado.";
-        mensaje.className = "mensaje-exito";
-
+        return;
     }
+
+    const botonCancelar = e.target?.closest(".btn-cancelar");
+
+    if (botonCancelar) {
+        const formulario = botonCancelar.closest(".form-modificar");
+        formulario.hidden = true;
+        return;
+    }
+
 
     const boton = e.target?.closest(".btn-eliminar");
 
@@ -159,14 +374,50 @@ contenedorAlumnos.addEventListener("click", (e) => {
     aplicarFiltros();
     actualizarEstadisticas();
 
-    mensaje.textContent = "Alumno eliminado.";
-    mensaje.className = "mensaje-error";
+    mostrarNotificacion(
+        "Alumno eliminado correctamente", "error"
+    );
 });
 
+contenedorAlumnos.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const formulario = e.target;
+
+    const id = Number(formulario.dataset.id);
+
+    const inputPromedio = formulario.querySelector(".input-promedio");
+
+    if (inputPromedio.value.trim() === "") {
+        Swal.fire(
+            "Sin promedio",
+            "Debes ingresar un promedio",
+            "error"
+        );
+        return;
+    }
+
+    const nuevoPromedio = Number(inputPromedio.value);
+
+    if (!Number.isFinite(nuevoPromedio) ||
+        nuevoPromedio < 0 ||
+        nuevoPromedio > 10) {
+
+        mensaje.textContent = "Ingresa un promedio valido entre 0 y 10."
+        mensaje.className = "mensaje-error";
+
+        return;
+    }
+
+    gestionModificacionPromedio(id, nuevoPromedio);
+
+});
 
 busqueda.addEventListener("input", aplicarFiltros);
 
 filtroCurso.addEventListener("change", aplicarFiltros);
+
+btnGenerarInforme.addEventListener("click", solicitarInformeAcademico);
 
 
 formulario.addEventListener("submit", (e) => {
@@ -188,13 +439,21 @@ formulario.addEventListener("submit", (e) => {
         || nota < 0
         || nota > 10
     ) {
-        mensaje.textContent = "Ingresá una nota válida entre 0 y 10.";
-        mensaje.className = "mensaje-error";
+        mostrarNotificacion(
+            "Ingresá una nota válida entre 0 y 10.", "error"
+        )
         return
     }
 
-    let siguienteId = Number(localStorage.getItem("siguienteId"
-    )) || Math.max(0, ...alumnos.map(alumno => alumno.id)) + 1;
+    const ultimoId = Math.max(
+        0,
+        ...alumnos.map(alumno => alumno.id)
+    );
+
+    let siguienteId = Math.max(
+        Number(localStorage.getItem("siguienteId")) || 1,
+        ultimoId + 1
+    );
 
     const nuevoAlumno = new Alumnos(
         siguienteId,
@@ -214,23 +473,107 @@ formulario.addEventListener("submit", (e) => {
     actualizarEstadisticas();
 
 
-    mensaje.textContent = `Alumno ${nombre.toUpperCase()} agregado con exito!`;
-    mensaje.className = "mensaje-exito";
+    mostrarNotificacion(
+        `Alumno ${nombre.toUpperCase()} agregado con exito!`
+    );
 
     formulario.reset();
 })
 
-function actualizarEstadisticas() {
-    totalAlumnos.textContent = alumnos.length;
+function generarInformeAcademico() {
 
-    const aprobados = alumnos.filter(a => a.aprobado);
-    totalAprobados.textContent = aprobados.length;
+    return new Promise((resolve, reject) => {
 
+        setTimeout(() => {
 
-    const suma = alumnos.reduce((acc, a) => acc + a.promedio, 0);
-    promedioGeneral.textContent =
-        alumnos.length > 0 ? (suma / alumnos.length).toFixed(2) : "-";
+            const estadisticas = obtenerEstadisticas();
+
+            if (estadisticas.total === 0) {
+                reject(new Error("No hay alumnos para generar el informe."));
+                return;
+            }
+
+            resolve(estadisticas);
+        }, 2000);
+
+    });
+
 }
 
-renderizarAlumnos(alumnos);
-actualizarEstadisticas()
+async function solicitarInformeAcademico() {
+
+    estadoInforme.textContent = "Generando Informe en PDF (simulado)...";
+    btnGenerarInforme.disabled = true;
+
+    try {
+
+        const informe = await generarInformeAcademico();
+
+        estadoInforme.textContent = "Generando informe PDF (simulacion).";
+
+        Swal.fire({
+
+            title: "Informe generado",
+            html: `
+                <p><strong>Total de alumnos:</strong> ${informe.total}</p>
+                <p><strong>Promedio general:</strong> ${informe.promedio.toFixed(2)}</p>
+                <p><strong>Alumnos aprobados:</strong> ${informe.aprobados}</p>
+            `,
+            icon: "success"
+
+        });
+
+    } catch (error) {
+
+        console.error("Error al generar informe:", error);
+
+        estadoInforme.textContent =
+            "Error: No se pudo generar el informe.";
+
+        Swal.fire({
+            title: "Error",
+            text: error.message,
+            icon: "error"
+        });
+
+    } finally {
+
+        btnGenerarInforme.disabled = false;
+
+    }
+
+}
+
+function obtenerEstadisticas() {
+    const aprobados = alumnos.filter(a => a.aprobado);
+
+    const suma = alumnos.reduce(
+        (acumulador, alumno) => acumulador + alumno.promedio,
+        0
+    );
+
+    return {
+        total: alumnos.length,
+        aprobados: aprobados.length,
+        promedio: alumnos.length > 0
+            ? suma / alumnos.length
+            : null
+    };
+
+}
+
+
+function actualizarEstadisticas() {
+    const estadisticas = obtenerEstadisticas();
+
+    totalAlumnos.textContent = estadisticas.total;
+
+    totalAprobados.textContent = estadisticas.aprobados;
+
+    promedioGeneral.textContent =
+        estadisticas.promedio !== null
+            ? estadisticas.promedio.toFixed(2)
+            : "-";
+}
+
+iniciarAplicacion();

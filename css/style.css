@@ -15,19 +15,20 @@
 body {
     background-color: #0b264d;
     font-family: "Abel", sans-serif;
-    font-weight: 100;
     min-height: 100vh;
     text-align: center;
 }
 
 
 header {
+    background-color: var(--secondary-color);
+    height: 8.5rem;
+    padding: 2rem;
     font-family: "Abel", sans-serif;
     font-size: 1.2rem;
     font-weight: 100;
     color: var(--bg-light);
     transition: color 0.3s ease, transform 0.3s ease;
-    margin-top: 20px;
     align-self: auto;
 
 
@@ -51,8 +52,6 @@ main {
 }
 
 section {
-    padding: 30px;
-    margin: 20px;
     display: flex;
     flex-direction: column;
     gap: 30px;
@@ -62,6 +61,17 @@ form {
     display: flex;
     flex-direction: column;
     gap: 5px;
+}
+
+footer {
+    padding: 10px;
+    text-align: center;
+}
+
+input {
+    border-radius: 10px;
+    padding: 10px 10px;
+    border-width: 2px;
 }
 
 
@@ -112,7 +122,6 @@ form {
 
 }
 
-
 #buscar-alumnos {
     grid-area: filtrado;
     background-color: var(--bg-light);
@@ -120,16 +129,8 @@ form {
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     height: 300px;
-    width: 400x;
-}
+    padding: 2rem;
 
-#container {
-    /* border: 1px solid red; */
-    max-width: 90vw;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    padding-bottom: 20px;
 }
 
 #contenedor-alumnos {
@@ -139,8 +140,7 @@ form {
     padding: 20px;
     background-color: #ffffff;
     border: 1px solid #000000;
-    border-radius: 14px;
-    padding: 18px;
+    border-radius: 15px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
     transition:
         transform 0.2s ease,
@@ -153,11 +153,10 @@ form {
     align-items: center;
     justify-content: space-between;
     gap: 16px;
-    padding: 12px 16px;
+    padding: 20px 20px;
     background-color: #ffffff;
     border: 1px solid #000000;
-    border-radius: 14px;
-    padding: 18px;
+    border-radius: 15px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 
     .info-label {
@@ -168,18 +167,59 @@ form {
     .info-value {
         color: #555;
     }
+}
 
+#filtro-curso {
+    border-radius: 30px;
+    padding: 10px 10px;
+    margin-bottom: 20px;
+    border-width: 2px;
+}
 
+#curso {
+    border-radius: 30px;
+    padding: 10px 10px;
+    margin-bottom: 20px;
+    border-width: 2px;
+}
+
+#btn-limpiar-alumnos {
+    width: 30%;
+    margin: 15px auto;
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    background-color: #ffffff;
+    color: rgb(21, 98, 166);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+
+    &:hover {
+        transform: translateY(-5px);
+        background-color: rgb(141, 7, 7);
+        color: rgb(233, 200, 200);
+    }
+
+}
+
+.tarjeta-info p strong {
+    font-weight: 600;
+    color: rgb(0, 0, 0);
+    text-transform: uppercase;
 }
 
 .cajas-formularios {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
     grid-template-areas:
         "agre estadis"
         "filtrado filtrado";
-    gap: 0.1px;
+    gap: 2rem;
+    padding: 2rem;
 }
 
 .tarjeta-titulo {
@@ -199,6 +239,15 @@ form {
     gap: 16px;
 }
 
+.aviso-docente {
+    padding: 1rem;
+    margin: 1rem;
+    background-color: var(--bg-light);
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
 #estadisticas {
     grid-area: estadis;
     background-color: var(--bg-light);
@@ -206,6 +255,7 @@ form {
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
     overflow: hidden;
     height: 400px;
+    padding: 2rem;
 }
 
 #estadisticas h2 {
@@ -231,10 +281,29 @@ form {
     color: rgb(0, 0, 0);
     text-decoration: none;
     transition: color 0.3s ease, transform 0.3s ease;
+
 }
 
 #seccion-alumnos h2 {
     color: var(--bg-light)
+}
+
+#cerrar-aviso {
+    align-self: end;
+    width: 50px;
+    padding: 2px;
+    border: none;
+    border-radius: 10px;
+    background-color: #fea0a0;
+    color: rgb(166, 21, 21);
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+
+    &:hover {
+        transform: translateY(-5px);
+    }
 }
 
 .mensaje-exito {
@@ -301,7 +370,67 @@ form {
     margin: 20px auto;
 }
 
-footer {
-    padding: 10px;
-    text-align: center;
+.form-modificar {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    animation: slideDown 0.3s ease forwards;
+}
+
+.form-modificar[hidden] {
+    display: none !important;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.btn-guardar {
+    width: auto;
+    margin-top: 14px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    background-color: #08c567;
+    color: rgb(6, 104, 55);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+
+    &:hover {
+        transform: translateY(-5px);
+    }
+}
+
+.btn-cancelar {
+    width: auto;
+    margin-top: 14px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    background-color: #fea0a0;
+    color: rgb(166, 21, 21);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+
+    &:hover {
+        transform: translateY(-5px);
+    }
 }
